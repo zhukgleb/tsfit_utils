@@ -7,8 +7,12 @@ from pathlib import Path
 
 
 def get_model_data(path2model: str | Path) -> pd.DataFrame:
-    path2output = path2model + "/output"  # rewrite for NOT linux only
-    with open(os.path.join(path2output), "r") as output_file:
+    # Если передан Path, преобразуем в строку (если нужно)
+    path_str = str(path2model) if isinstance(path2model, Path) else path2model
+
+    path2output = os.path.join(path_str, "output")  # Работает для любой ОС
+
+    with open(path2output, "r") as output_file:
         output_file_lines = output_file.readlines()
 
     output_file_header = output_file_lines[0].strip().split("\t")
@@ -19,7 +23,6 @@ def get_model_data(path2model: str | Path) -> pd.DataFrame:
     return output_file_df
 
 
-# delete all bad lines after fitting (old function)
 def clean_linemask(
     path2linemask: str, path2output: str, delete_warnings=False, delete_errors=True
 ):

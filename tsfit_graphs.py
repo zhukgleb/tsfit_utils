@@ -539,7 +539,6 @@ if __name__ == "__main__":
 
     out_1 = "Fe1_4900_0.0"
     out_2 = Path("2025-03-31-16-46-54_0.7936911305143918_LTE_Fe_1D")
-    print(type(out_2), type(tsfit_output))
 
     r = "Fe_H"
 
