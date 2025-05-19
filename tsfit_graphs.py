@@ -538,7 +538,7 @@ if __name__ == "__main__":
     tsfit_output = Path(tsfit_output)
 
     out_1 = "Fe1_4900_0.0"
-    out_2 = Path("2025-03-31-16-46-54_0.7936911305143918_LTE_Fe_1D")
+    out_2 = Path("2025-04-02-17-14-10_0.8557620357968713_LTE_Fe_1D")
 
     r = "Fe_H"
 
@@ -553,11 +553,11 @@ if __name__ == "__main__":
     # energy_dispersion(pd_data_1, ratio="C_Fe", path2vald="C1data", element_name="'C 1'")
     # wavelenght_group(pd_data_1, r)
 
-    # plot_metall(pd_data_1, ratio=r)
+    plot_metall(pd_data_2, ratio=r)
     # plot_metallVS(pd_data_1, pd_data_2, r)
     # plot_metall_KDE(pd_data_1, r)
     # plot_metall_KDE(pd_data_2, r)
 
-    teff_analysis(pd_data_2, object="IRAS Z02229+6208", save=False)
+    # teff_analysis(pd_data_2, object="IRAS Z02229+6208", save=False)
     # plot_ion_balance(pd_data_2)
     # hist_estimation(pd_data_2, 30)
