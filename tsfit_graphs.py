@@ -531,6 +531,7 @@ if __name__ == "__main__":
     pd_data_1 = get_model_data(tsfit_output / out_1)
     m = Model(tsfit_output / out_1)
     print(m.model_data)
+    print("test")
     # pd_data_2 = get_model_data(tsfit_output / out_2)
     # line_combiner(spectrum, c_linemask)
 
