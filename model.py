@@ -3,10 +3,6 @@ import pandas as pd
 import numpy as np
 from typing import Union
 
-from pandas.core.frame import frame_sub_kwargs
-
-from tsfit_utils import get_fitlist
-
 
 class Model:
     def __init__(self, path2model: str | Path):
@@ -40,6 +36,7 @@ class Model:
     @property
     def model_data(self) -> pd.DataFrame | list[Union[np.ndarray, list]]:
         full_data = self._read_and_parse_file(self.path2output)
+
         if self.spectra_num > 1:
             print("output file is compicated")
             """

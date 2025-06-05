@@ -517,6 +517,7 @@ def line_combiner(spectrum: np.ndarray, linelist: np.ndarray):
 if __name__ == "__main__":
     from config_loader import tsfit_output
     from pathlib import Path
+    from model import Model
 
     print(f"TSFitPy output from config: {tsfit_output}")
     tsfit_output = Path(tsfit_output)
@@ -528,6 +529,8 @@ if __name__ == "__main__":
     r = "Fe_H"
 
     pd_data_1 = get_model_data(tsfit_output / out_1)
+    m = Model(tsfit_output / out_1)
+    print(m.model_data)
     # pd_data_2 = get_model_data(tsfit_output / out_2)
     # line_combiner(spectrum, c_linemask)
 
@@ -543,6 +546,6 @@ if __name__ == "__main__":
     # plot_metall_KDE(pd_data_1, r)
     # plot_metall_KDE(pd_data_2, r)
 
-    teff_analysis(pd_data_1, object="IRAS Z02229+6208", save=False)
+    # teff_analysis(pd_data_1, object="IRAS Z02229+6208", save=False)
     # plot_ion_balance(pd_data_2)
     # hist_estimation(pd_data_2, 30)
