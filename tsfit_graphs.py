@@ -304,14 +304,13 @@ def plot_metall_KDE(data: pd.DataFrame, ratio: str = "Fe_H", bandwidth=0.05):
 
 
 def teff_analysis(pd_data: pd.DataFrame, save=False, object="star"):
-    column_name = "Teff"
     wavelenght = pd_data["wave_center"].values
     wavelenght = [float(wavelenght[x]) for x in range(len(wavelenght))]
     errors = pd_data["chi_squared"].values
     errors = [float(errors[x]) for x in range(len(errors))]
 
-    if np.argwhere(pd_data.columns.values == column_name) != -1:
-        column_data = pd_data[column_name].values
+    if np.argwhere(pd_data.columns.values == "Teff") != -1:  # Check the pyright!
+        column_data = pd_data["Teff"].values
         column_data = [float(column_data[x]) for x in range(len(column_data))]
         column_data_median = np.median(column_data)
         with plt.style.context("science"):
@@ -332,23 +331,8 @@ def teff_analysis(pd_data: pd.DataFrame, save=False, object="star"):
             )
             ax[0].set_xlabel(r"Wavelegth, \AA")
             ax[1].set_ylabel(r"$T_{eff}$, K")
-            print(f"Median vmic: {column_data_median}")
-            # bootstrapped_medians = [
-            #     np.median(
-            #         np.random.choice(column_data, size=len(column_data), replace=True)
-            #     )
-            #     for _ in range(10**6)
-            # ]
-            # median_variance = np.var(bootstrapped_medians)
-            # print(f"Дисперсия медианы: {median_variance}")
-            # ax[0].fill_between(
-            #     wavelenght,
-            #     column_data_median - median_variance,
-            #     column_data_median + median_variance,
-            #     color="blue",
-            #     alpha=0.2,
-            #     label="median median_variance",
-            # )
+            print(f"Median teff: {column_data_median}")
+
             lower = np.percentile(column_data, 5, axis=0)
             upper = np.percentile(column_data, 95, axis=0)
             lower_p = np.percentile(column_data, 16)
@@ -538,12 +522,13 @@ if __name__ == "__main__":
     tsfit_output = Path(tsfit_output)
 
     out_1 = "Fe1_4900_0.0"
-    out_2 = Path("2025-04-02-17-14-10_0.8557620357968713_LTE_Fe_1D")
+    out_1 = Path("05113_teff")
+    out_2 = Path("2025-05-26-20-37-58_0.8075572190850129_LTE_Fe_1D")
 
     r = "Fe_H"
 
-    # pd_data_1 = get_model_data(tsfit_output + out_1)
-    pd_data_2 = get_model_data(tsfit_output / out_2)
+    pd_data_1 = get_model_data(tsfit_output / out_1)
+    # pd_data_2 = get_model_data(tsfit_output / out_2)
     # line_combiner(spectrum, c_linemask)
 
     # pd_data_1 = clean_pd(pd_data_1, True, True)
@@ -553,11 +538,11 @@ if __name__ == "__main__":
     # energy_dispersion(pd_data_1, ratio="C_Fe", path2vald="C1data", element_name="'C 1'")
     # wavelenght_group(pd_data_1, r)
 
-    plot_metall(pd_data_2, ratio=r)
+    # plot_metall(pd_data_2, ratio=r)
     # plot_metallVS(pd_data_1, pd_data_2, r)
     # plot_metall_KDE(pd_data_1, r)
     # plot_metall_KDE(pd_data_2, r)
 
-    # teff_analysis(pd_data_2, object="IRAS Z02229+6208", save=False)
+    teff_analysis(pd_data_1, object="IRAS Z02229+6208", save=False)
     # plot_ion_balance(pd_data_2)
     # hist_estimation(pd_data_2, 30)

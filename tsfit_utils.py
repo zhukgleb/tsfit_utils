@@ -6,21 +6,72 @@ import os
 from pathlib import Path
 
 
+class Model:
+    def __init__(self, path2model: str | Path):
+        self.path2model = (
+            Path(path2model) if isinstance(path2model, str) else path2model
+        )
+        self.path2output = self.path2model / "output"
+        self.path2fit = self.path2model / "fitlist.txt"
+
+    def _read_and_parse_file(self, file_path: Path) -> pd.DataFrame:
+        with open(file_path, "r") as f:
+            lines = [line.strip() for line in f if line.strip()]
+
+        if not lines:
+            return pd.DataFrame()
+
+        data = [line.split() for line in lines]
+
+        header = data[0]
+        if header[0].startswith("#"):
+            header[0] = header[0][1:]
+
+        num_columns = len(header)
+        data_rows = data[1:]
+
+        filtered_data = [row for row in data_rows if len(row) == num_columns]
+
+        return pd.DataFrame(filtered_data, columns=header)
+
+    def get_model_data(self) -> pd.DataFrame:
+        return self._read_and_parse_file(self.path2output)
+
+    def get_fitlist(self) -> pd.DataFrame:
+        return self._read_and_parse_file(self.path2fit)
+
+
 def get_model_data(path2model: str | Path) -> pd.DataFrame:
-    # Если передан Path, преобразуем в строку (если нужно)
     path_str = str(path2model) if isinstance(path2model, Path) else path2model
 
-    path2output = os.path.join(path_str, "output")  # Работает для любой ОС
+    path2data = os.path.join(path_str, "output")
+    with open(path2data, "r") as data_file:
+        data_file_lines = data_file.readlines()
+    data_file_header = data_file_lines[0].strip().split("\t")
+    data_file_header[0] = data_file_header[0].replace("#", "")
+    data_file_data_lines = [line.strip().split() for line in data_file_lines[1:]]
+    data_file_df = pd.DataFrame(data_file_data_lines, columns=data_file_header)
 
-    with open(path2output, "r") as output_file:
-        output_file_lines = output_file.readlines()
+    return data_file_df
 
-    output_file_header = output_file_lines[0].strip().split("\t")
-    output_file_header[0] = output_file_header[0].replace("#", "")
-    output_file_data_lines = [line.strip().split() for line in output_file_lines[1:]]
-    output_file_df = pd.DataFrame(output_file_data_lines, columns=output_file_header)
 
-    return output_file_df
+""" 
+May be too simular to top function 
+"""
+
+
+def get_fitlist(path2model: str | Path) -> pd.DataFrame:
+    path_str = str(path2model) if isinstance(path2model, Path) else path2model
+
+    path2fit = os.path.join(path_str, "fitlist.txt")
+    with open(path2fit, "r") as fit_file:
+        fit_file_lines = fit_file.readlines()
+    fit_file_header = fit_file_lines[0].strip().split("\t")
+    fit_file_header[0] = fit_file_header[0].replace("#", "")
+    fit_file_data_lines = [line.strip().split() for line in fit_file_lines[1:]]
+    fit_file_df = pd.DataFrame(fit_file_data_lines, columns=fit_file_header)
+
+    return fit_file_df
 
 
 def clean_linemask(
@@ -103,6 +154,8 @@ if __name__ == "__main__":
     #     linemask_path = (
     #         "/home/gamma/TSFitPy/input_files/linemask_files/Fe/fe12-lmask_VG_clear.txt"
     # )
-    data_path = "/home/lambda/TSFitPy/output_files/Oct-28-2024-16-30-31_0.8750247136632259_LTE_Fe_1D"
-    # clean_linemask(linemask_path, data_path)
-
+    data_path = "/home/epsilon/TSFitPy/output_files/05113_teff/"
+    m = Model(data_path)
+    # pd_data = m.get_model_data()
+    fitlist = m.get_fitlist()
+    print(fitlist)
