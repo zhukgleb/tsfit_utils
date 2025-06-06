@@ -23,15 +23,15 @@ class Model:
         data = [line.split() for line in lines]
 
         header = data[0]
-        if header[0].startswith("#"):  # for fitlist file case
+        if header[0].startswith("#"):
             header[0] = header[0][1:]
 
-        num_columns = len(header)
         data_rows = data[1:]
 
-        filtered_data = [row for row in data_rows if len(row) == num_columns]
+        num_data_columns = len(data_rows[0]) if data_rows else 0
+        used_columns = header[:num_data_columns]
 
-        return pd.DataFrame(filtered_data, columns=header)
+        return pd.DataFrame(data_rows, columns=used_columns)
 
     @property
     def model_data(self) -> pd.DataFrame | list[Union[np.ndarray, list]]:
@@ -77,3 +77,4 @@ if __name__ == "__main__":
     m = Model(data_path)
     d = m.model_data
     print(d[1])
+    print(d[2])
