@@ -303,66 +303,78 @@ def plot_metall_KDE(data: pd.DataFrame, ratio: str = "Fe_H", bandwidth=0.05):
         print(f"Средняя ошибка металличности (1σ): {error:.3f}")
 
 
-def teff_analysis(pd_data: pd.DataFrame, save=False, object="star"):
-    wavelenght = pd_data["wave_center"].values
-    wavelenght = [float(wavelenght[x]) for x in range(len(wavelenght))]
-    errors = pd_data["chi_squared"].values
-    errors = [float(errors[x]) for x in range(len(errors))]
+def teff_analysis(pd_data: pd.DataFrame | list, save=False, object="star"):
+    if type(pd_data) is list and len(pd_data[0]) > 1:
+        pass
+    else:
+        wavelenght = pd_data["wave_center"].values
+        wavelenght = [float(wavelenght[x]) for x in range(len(wavelenght))]
+        errors = pd_data["chi_squared"].values
+        errors = [float(errors[x]) for x in range(len(errors))]
 
-    if np.argwhere(pd_data.columns.values == "Teff") != -1:  # Check the pyright!
-        column_data = pd_data["Teff"].values
-        column_data = [float(column_data[x]) for x in range(len(column_data))]
-        column_data_median = np.median(column_data)
-        with plt.style.context("science"):
-            fig, ax = plt.subplots(1, 2, figsize=(10, 4), sharey=True)
-            fig.suptitle(r"$T_{eff}$ estimation of " + object)
-            ax[0].set_title(r"$T_{eff}$ variation")
-            ax[0].scatter(wavelenght, column_data, color="black", alpha=0.9)
-            ax[0].errorbar(wavelenght, column_data, errors, marker="o", ls=" ")
-            ax[0].set_xlim((5000, 7000))
-            # draw a medion line
-            ax[0].plot(
-                (wavelenght[0], wavelenght[-1]),
-                (column_data_median, column_data_median),
-                ls="dashed",
-                color="crimson",
-                lw=2,
-                label=r"median $T_{eff}$ value",
-            )
-            ax[0].set_xlabel(r"Wavelegth, \AA")
-            ax[1].set_ylabel(r"$T_{eff}$, K")
-            print(f"Median teff: {column_data_median}")
+        if np.argwhere(pd_data.columns.values == "Teff") != -1:  # Check the pyright!
+            column_data = pd_data["Teff"].values
+            column_data = [float(column_data[x]) for x in range(len(column_data))]
+            column_data_median = np.median(column_data)
+            with plt.style.context("science"):
+                fig, ax = plt.subplots(1, 2, figsize=(10, 4), sharey=True)
+                fig.suptitle(r"$T_{eff}$ estimation of " + object)
+                ax[0].set_title(r"$T_{eff}$ variation")
+                ax[0].scatter(wavelenght, column_data, color="black", alpha=0.9)
+                ax[0].errorbar(wavelenght, column_data, errors, marker="o", ls=" ")
+                ax[0].set_xlim((5000, 7000))
+                # draw a medion line
+                ax[0].plot(
+                    (wavelenght[0], wavelenght[-1]),
+                    (column_data_median, column_data_median),
+                    ls="dashed",
+                    color="crimson",
+                    lw=2,
+                    label=r"median $T_{eff}$ value",
+                )
+                ax[0].set_xlabel(r"Wavelegth, \AA")
+                ax[1].set_ylabel(r"$T_{eff}$, K")
+                print(f"Median teff: {column_data_median}")
 
-            lower = np.percentile(column_data, 5, axis=0)
-            upper = np.percentile(column_data, 95, axis=0)
-            lower_p = np.percentile(column_data, 16)
-            upper_p = np.percentile(column_data, 84)
+                lower = np.percentile(column_data, 5, axis=0)
+                upper = np.percentile(column_data, 95, axis=0)
+                lower_p = np.percentile(column_data, 16)
+                upper_p = np.percentile(column_data, 84)
 
-            print(
-                f"percentile is \n lower:{lower_p} \n upper: {upper_p} \n std: {np.std(column_data)}"
-            )
-            ax[0].fill_between(
-                wavelenght, lower, upper, color="blue", alpha=0.2, label=r"$3\sigma$"
-            )
-            ax[0].fill_between(
-                wavelenght,
-                lower_p,
-                upper_p,
-                color="navy",
-                alpha=0.7,
-                label=r"$\sigma$",
-            )
-            ax[1].set_title(r"$T_{eff}$ histogram")
-            ax[1].hist(
-                column_data, bins=15, orientation="horizontal", color="black", alpha=0.7
-            )
-            ax[1].set_xlabel("N")
-            ax[0].legend()
-            plt.tight_layout()
-            if save:
-                plt.savefig("teff_estimation.pdf", dpi=300)
-            else:
-                plt.show()
+                print(
+                    f"percentile is \n lower:{lower_p} \n upper: {upper_p} \n std: {np.std(column_data)}"
+                )
+                ax[0].fill_between(
+                    wavelenght,
+                    lower,
+                    upper,
+                    color="blue",
+                    alpha=0.2,
+                    label=r"$3\sigma$",
+                )
+                ax[0].fill_between(
+                    wavelenght,
+                    lower_p,
+                    upper_p,
+                    color="navy",
+                    alpha=0.7,
+                    label=r"$\sigma$",
+                )
+                ax[1].set_title(r"$T_{eff}$ histogram")
+                ax[1].hist(
+                    column_data,
+                    bins=15,
+                    orientation="horizontal",
+                    color="black",
+                    alpha=0.7,
+                )
+                ax[1].set_xlabel("N")
+                ax[0].legend()
+                plt.tight_layout()
+                if save:
+                    plt.savefig("teff_estimation.pdf", dpi=300)
+                else:
+                    plt.show()
 
 
 def gaussian(Z, A, mu, sigma):
@@ -530,8 +542,8 @@ if __name__ == "__main__":
 
     pd_data_1 = get_model_data(tsfit_output / out_1)
     m = Model(tsfit_output / out_1)
-    print(m.model_data)
-    print("test")
+    data = m.model_data
+    teff_analysis(data)
     # pd_data_2 = get_model_data(tsfit_output / out_2)
     # line_combiner(spectrum, c_linemask)
 
