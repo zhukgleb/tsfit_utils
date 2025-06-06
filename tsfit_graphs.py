@@ -305,7 +305,12 @@ def plot_metall_KDE(data: pd.DataFrame, ratio: str = "Fe_H", bandwidth=0.05):
 
 def teff_analysis(pd_data: pd.DataFrame | list, save=False, object="star"):
     if type(pd_data) is list and len(pd_data[0]) > 1:
-        pass
+        parsed_data = pd_data[0]
+        parsed_names = pd_data[1]
+        s_num = len(parsed_names)
+        # print(parsed_data[0])
+        assert s_num == len(parsed_data), "Data parsed not correct."
+
     else:
         wavelenght = pd_data["wave_center"].values
         wavelenght = [float(wavelenght[x]) for x in range(len(wavelenght))]
@@ -534,8 +539,9 @@ if __name__ == "__main__":
     print(f"TSFitPy output from config: {tsfit_output}")
     tsfit_output = Path(tsfit_output)
 
-    out_1 = "Fe1_4900_0.0"
-    out_1 = Path("05113_teff")
+    # out_1 = "Fe1_4900_0.0"
+    # out_1 = Path("05113_teff")
+    out_1 = Path("2025-06-06-23-21-05_0.34917075887731897_LTE_Fe_1D")
     out_2 = Path("2025-05-26-20-37-58_0.8075572190850129_LTE_Fe_1D")
 
     r = "Fe_H"
