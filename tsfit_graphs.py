@@ -1,3 +1,4 @@
+from matplotlib.style import context
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -309,8 +310,30 @@ def teff_analysis(pd_data: pd.DataFrame | list, save=False, object="star"):
         parsed_names = pd_data[1]
         s_num = len(parsed_names)
         assert s_num == len(parsed_data), "Data parsed not correct."
-        fig, ax = plt.subplots(nrows=s_num, ncols=1)
-        plt.show()
+        # plot part
+        with plt.style.context("science"):
+            fig, ax = plt.subplots(nrows=s_num, ncols=1)
+            plt.xlabel("Teff")
+            plt.ylabel(r"$\sigma$")
+            for graph in range(len(parsed_data)):
+                wavelenght = parsed_data[graph]["wave_center"].values.astype(np.float64)
+                teff = parsed_data[graph]["Teff"].values.astype(np.float64)
+                teff_error = parsed_data[graph]["Teff_error"].values.astype(np.float64)
+                chi_2 = parsed_data[graph]["chi_squared"].values.astype(np.float64)
+
+                # ax[graph].scatter(wavelenght, chi_2)
+                ax[graph].errorbar(
+                    wavelenght,
+                    teff,
+                    teff_error,
+                    marker="o",
+                    ls=" ",
+                    color="black",
+                    alpha=0.9,
+                )
+                ax[graph].set_xlim((5000, 7000))
+
+            plt.show()
 
     else:
         wavelenght = pd_data["wave_center"].values
