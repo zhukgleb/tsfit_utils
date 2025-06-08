@@ -308,8 +308,9 @@ def teff_analysis(pd_data: pd.DataFrame | list, save=False, object="star"):
         parsed_data = pd_data[0]
         parsed_names = pd_data[1]
         s_num = len(parsed_names)
-        # print(parsed_data[0])
         assert s_num == len(parsed_data), "Data parsed not correct."
+        fig, ax = plt.subplots(nrows=s_num, ncols=1)
+        plt.show()
 
     else:
         wavelenght = pd_data["wave_center"].values
