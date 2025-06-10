@@ -18,6 +18,7 @@ def teff_analysis(pd_data: pd.DataFrame | list, save=False, object="star"):
 
             mean_teff = []
             mad_teff = []
+            std_teff = []
             for graph in range(len(parsed_data)):
                 wavelenght = parsed_data[graph]["wave_center"].values.astype(np.float64)
                 teff = parsed_data[graph]["Teff"].values.astype(np.float64)
@@ -25,9 +26,11 @@ def teff_analysis(pd_data: pd.DataFrame | list, save=False, object="star"):
                 chi_2 = parsed_data[graph]["chi_squared"].values.astype(np.float64)
                 mean = np.mean(teff)
                 mad = median_abs_deviation(teff)
-                print(f"Mean {mean}, \n MAD {mad}")
+                std = np.std(teff)
+                print(f"Mean {mean} \n MAD {mad} \n STD {std}")
                 mean_teff.append(mean)
                 mad_teff.append(mad)
+                std_teff.append(std)
 
                 # ax[graph].scatter(wavelenght, chi_2)
                 ax[graph].errorbar(
@@ -39,7 +42,7 @@ def teff_analysis(pd_data: pd.DataFrame | list, save=False, object="star"):
                     color="black",
                     alpha=0.9,
                 )
-            #                 ax[graph].set_xlim((5000, 7000))
+                ax[graph].set_xlim((5000, 7000))
 
             plt.show()
 
