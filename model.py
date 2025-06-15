@@ -57,7 +57,7 @@ class Model:
                 breakpoint()
 
             full_data = full_data.to_numpy()
-            return [full_data, self.spectra_names]
+            return [data_cube, self.spectra_names]
         else:
             print("file is simple")
             return full_data
