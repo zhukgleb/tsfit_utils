@@ -2,6 +2,18 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import median_abs_deviation
+from math import floor, ceil
+
+
+def calculate_grid(num_of_models: int) -> list:
+    if num_of_models**0.5 == floor(num_of_models**0.5):
+        return [num_of_models**0.5, num_of_models**0.5]
+
+    else:
+        pass
+
+    rows, cols = 0, 0
+    return [rows, cols]
 
 
 def teff_analysis(pd_data: pd.DataFrame | list, save=False, object="star"):
@@ -12,6 +24,7 @@ def teff_analysis(pd_data: pd.DataFrame | list, save=False, object="star"):
         assert s_num == len(parsed_data), "Data parsed not correct."
         # plot part
         with plt.style.context("science"):
+            x, y = calculate_grid(s_num)
             fig, ax = plt.subplots(nrows=s_num, ncols=1)
             plt.xlabel("Teff")
             plt.ylabel(r"$\sigma$")
@@ -43,7 +56,7 @@ def teff_analysis(pd_data: pd.DataFrame | list, save=False, object="star"):
                     alpha=0.9,
                 )
                 ax[graph].set_xlim((5000, 7000))
-
+            plt.tight_layout()
             plt.show()
 
     else:
