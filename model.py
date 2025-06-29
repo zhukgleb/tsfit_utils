@@ -56,8 +56,13 @@ class Model:
                 print("Output file is broken")
                 breakpoint()
 
-            full_data = full_data.to_numpy()
-            return [data_cube, self.spectra_names]
+            # models_data = np.array((self.spectra_teff, self.spectra_logg, self.spectra_feh))
+            models_data = []
+            for params in range(len(data_cube)):
+                models_data.append([self.spectra_teff[params], self.spectra_logg[params], self.spectra_feh[params]])
+                
+
+            return [data_cube, self.spectra_names, models_data]
         else:
             print("file is simple")
             return full_data
@@ -66,14 +71,21 @@ class Model:
     def fitlist_data(self) -> pd.DataFrame:
         return self._read_and_parse_file(self.path2fit)
 
+    # cursed..
     def _model_anal(self) -> None:
         fitlist = self.fitlist_data
         self.spectra_names = fitlist.values[:, 0]
         self.spectra_num = int(len(self.spectra_names))
+        self.spectra_teff = fitlist.values[:, 2]
+        self.spectra_logg = fitlist.values[:, 3]
+        try:
+            self.spectra_feh = fitlist.values[:, 4]
+        except IndexError:
+            self.spectra_feh = [0 for x in self.spectra_names]
 
 
 if __name__ == "__main__":
     data_path = "/home/epsilon/TSFitPy/output_files/05113_teff/"
     m = Model(data_path)
     d = m.model_data
-    print(d[1])
+    print(d)

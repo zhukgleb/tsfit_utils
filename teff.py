@@ -20,6 +20,7 @@ def teff_analysis(pd_data: pd.DataFrame | list, save=False, object="star"):
     if type(pd_data) is list and len(pd_data[0]) > 1:
         parsed_data = pd_data[0]
         parsed_names = pd_data[1]
+        model_data = pd_data[2]
         s_num = len(parsed_names)
         assert s_num == len(parsed_data), "Data parsed not correct."
         # plot part
@@ -28,8 +29,6 @@ def teff_analysis(pd_data: pd.DataFrame | list, save=False, object="star"):
             x_grid = 3
             y_grid = 4
             fig, ax = plt.subplots(nrows=x_grid, ncols=y_grid, figsize=(8, 8))
-            # plt.xlabel("Teff")
-            # plt.ylabel(r"$\sigma$")
 
             mean_teff = []
             mad_teff = []
@@ -47,6 +46,7 @@ def teff_analysis(pd_data: pd.DataFrame | list, save=False, object="star"):
             else:
                 axes = [axes] 
 
+            print(model_data)
             for x in range(min(len(parsed_data), n_rows * n_cols)):
                 wavelength = parsed_data[x]["wave_center"].values.astype(np.float64)
                 teff = parsed_data[x]["Teff"].values.astype(np.float64)
@@ -58,15 +58,14 @@ def teff_analysis(pd_data: pd.DataFrame | list, save=False, object="star"):
                 axes[x].set_xlim((5000, 7000))
                 axes[x].set_xlabel('Wavelength (Å)')
                 axes[x].set_ylabel('Teff (K)')
-                axes[x].set_title(f'{x+1}')
+                axes[x].set_title(f'{model_data[x][0]}, {model_data[x][1]}, {model_data[x][2]}, {x+1}')
                 axes[x].grid(True)
                 axes[x].legend()
 
-            # Если графиков меньше, чем ячеек в сетке, скрываем лишние
             for x in range(len(parsed_data), n_rows * n_cols):
                 axes[x].axis('off')
 
-            plt.show()           
+        plt.show()           
             
 
 
