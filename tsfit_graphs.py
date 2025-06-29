@@ -467,6 +467,7 @@ if __name__ == "__main__":
     # out_1 = Path("2025-06-06-23-21-05_0.34917075887731897_LTE_Fe_1D")
     out_2 = Path("2025-05-26-20-37-58_0.8075572190850129_LTE_Fe_1D")
     out_1 = Path("05113_teff_testlog")
+    out_1 = Path("05113_teff_large")
 
     r = "Fe_H"
 

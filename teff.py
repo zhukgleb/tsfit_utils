@@ -24,40 +24,76 @@ def teff_analysis(pd_data: pd.DataFrame | list, save=False, object="star"):
         assert s_num == len(parsed_data), "Data parsed not correct."
         # plot part
         with plt.style.context("science"):
-            x, y = calculate_grid(s_num)
-            fig, ax = plt.subplots(nrows=s_num, ncols=1)
-            plt.xlabel("Teff")
-            plt.ylabel(r"$\sigma$")
+            # x, y = calculate_grid(s_num)
+            x_grid = 3
+            y_grid = 4
+            fig, ax = plt.subplots(nrows=x_grid, ncols=y_grid, figsize=(8, 8))
+            # plt.xlabel("Teff")
+            # plt.ylabel(r"$\sigma$")
 
             mean_teff = []
             mad_teff = []
             std_teff = []
-            for graph in range(len(parsed_data)):
-                wavelenght = parsed_data[graph]["wave_center"].values.astype(np.float64)
-                teff = parsed_data[graph]["Teff"].values.astype(np.float64)
-                teff_error = parsed_data[graph]["Teff_error"].values.astype(np.float64)
-                chi_2 = parsed_data[graph]["chi_squared"].values.astype(np.float64)
-                mean = np.mean(teff)
-                mad = median_abs_deviation(teff)
-                std = np.std(teff)
-                print(f"Mean {mean} \n MAD {mad} \n STD {std}")
-                mean_teff.append(mean)
-                mad_teff.append(mad)
-                std_teff.append(std)
+            colors = ['red', 'blue', 'green']
+            
+            n_rows = 3  
+            n_cols = 4  
 
-                # ax[graph].scatter(wavelenght, chi_2)
-                ax[graph].errorbar(
-                    wavelenght,
-                    teff,
-                    teff_error,
-                    marker="o",
-                    ls=" ",
-                    color="black",
-                    alpha=0.9,
-                )
-                ax[graph].set_xlim((5000, 7000))
-            plt.tight_layout()
-            plt.show()
+            fig, axes = plt.subplots(n_rows, n_cols, figsize=(15, 10))
+            fig.tight_layout(pad=5.0) 
+
+            if n_rows > 1 and n_cols > 1:
+                axes = axes.ravel()
+            else:
+                axes = [axes] 
+
+            for x in range(min(len(parsed_data), n_rows * n_cols)):
+                wavelength = parsed_data[x]["wave_center"].values.astype(np.float64)
+                teff = parsed_data[x]["Teff"].values.astype(np.float64)
+                teff_error = parsed_data[x]["Teff_error"].values.astype(np.float64)
+                
+                axes[x].errorbar(wavelength, teff, yerr=teff_error, fmt='o', markersize=5, 
+                                capsize=3, label=f'Dataset {x+1}')
+                
+                axes[x].set_xlim((5000, 7000))
+                axes[x].set_xlabel('Wavelength (Å)')
+                axes[x].set_ylabel('Teff (K)')
+                axes[x].set_title(f'{x+1}')
+                axes[x].grid(True)
+                axes[x].legend()
+
+            # Если графиков меньше, чем ячеек в сетке, скрываем лишние
+            for x in range(len(parsed_data), n_rows * n_cols):
+                axes[x].axis('off')
+
+            plt.show()           
+            
+
+
+            # for graph in range(len(parsed_data)):
+            #     wavelenght = parsed_data[graph]["wave_center"].values.astype(np.float64)
+            #     teff = parsed_data[graph]["Teff"].values.astype(np.float64)
+            #     teff_error = parsed_data[graph]["Teff_error"].values.astype(np.float64)
+            #     chi_2 = parsed_data[graph]["chi_squared"].values.astype(np.float64)
+            #     mean = np.mean(teff)
+            #     mad = median_abs_deviation(teff)
+            #     std = np.std(teff)
+            #     print(f"Mean {mean} \n MAD {mad} \n STD {std}")
+            #     mean_teff.append(mean)
+            #     mad_teff.append(mad)
+            #     std_teff.append(std)
+
+            #     # ax[graph].scatter(wavelenght, chi_2)
+            #     ax[graph].errorbar(
+            #         wavelenght,
+            #         teff,
+            #         teff_error,
+            #         marker="o",
+            #         ls=" ",
+            #         color="black",
+            #         alpha=0.9,
+            #     )
+            #     ax[graph].set_xlim((5000, 7000))
 
     else:
         wavelenght = pd_data["wave_center"].values
