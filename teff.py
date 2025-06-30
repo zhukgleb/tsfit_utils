@@ -3,6 +3,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import median_abs_deviation
 from math import floor, ceil
+from matplotlib.cm import ScalarMappable
+from matplotlib.colors import Normalize
+from matplotlib.colors import LogNorm 
 
 
 def calculate_grid(num_of_models: int) -> list:
@@ -23,17 +26,20 @@ def teff_analysis(pd_data: pd.DataFrame | list, save=False, object="star"):
         model_data = pd_data[2]
         s_num = len(parsed_names)
         assert s_num == len(parsed_data), "Data parsed not correct."
+
         # plot part
         with plt.style.context("science"):
             # x, y = calculate_grid(s_num)
-            x_grid = 3
-            y_grid = 4
-            fig, ax = plt.subplots(nrows=x_grid, ncols=y_grid, figsize=(8, 8))
+
+            chi_values = np.concatenate([d["chi_squared"].values.astype(np.float64) for d in parsed_data])
+            # norm = LogNorm(vmin=np.min(chi_values), vmax=np.max(chi_values))
+            norm = Normalize(vmin=np.min(chi_values), vmax=np.max(chi_values))
+            cmap = plt.get_cmap('hot')
+                
 
             mean_teff = []
             mad_teff = []
             std_teff = []
-            colors = ['red', 'blue', 'green']
             
             n_rows = 3  
             n_cols = 4  
@@ -46,29 +52,30 @@ def teff_analysis(pd_data: pd.DataFrame | list, save=False, object="star"):
             else:
                 axes = [axes] 
 
-            print(model_data)
             for x in range(min(len(parsed_data), n_rows * n_cols)):
                 wavelength = parsed_data[x]["wave_center"].values.astype(np.float64)
                 teff = parsed_data[x]["Teff"].values.astype(np.float64)
                 teff_error = parsed_data[x]["Teff_error"].values.astype(np.float64)
+                chi_2 = parsed_data[x]["chi_squared"].values.astype(np.float64)
                 
-                axes[x].errorbar(wavelength, teff, yerr=teff_error, fmt='o', markersize=5, 
-                                capsize=3, label=f'Dataset {x+1}')
+                sc = axes[x].scatter(wavelength, teff, c=chi_2, cmap=cmap, norm=norm, s=50)
                 
-                axes[x].set_xlim((5000, 7000))
-                axes[x].set_xlabel('Wavelength (Å)')
-                axes[x].set_ylabel('Teff (K)')
+                axes[x].errorbar(wavelength, teff, yerr=teff_error, fmt='none', 
+                                ecolor='gray', alpha=0.5, capsize=3)
+                
+                axes[x].set_xlabel('Wavelength')
+                axes[x].set_ylabel('Teff')
                 axes[x].set_title(f'{model_data[x][0]}, {model_data[x][1]}, {model_data[x][2]}, {x+1}')
-                axes[x].grid(True)
-                axes[x].legend()
+                axes[x].grid(True, alpha=0.3)
 
-            for x in range(len(parsed_data), n_rows * n_cols):
-                axes[x].axis('off')
+       
+            fig.subplots_adjust(right=0.85)  
 
-        plt.show()           
-            
+            cbar_ax = fig.add_axes([0.88, 0.15, 0.02, 0.7])  
+            cbar = fig.colorbar(ScalarMappable(norm=norm, cmap=cmap), cax=cbar_ax)
+            cbar.set_label('chi squared value', rotation=270, labelpad=15)
 
-
+            plt.show() 
             # for graph in range(len(parsed_data)):
             #     wavelenght = parsed_data[graph]["wave_center"].values.astype(np.float64)
             #     teff = parsed_data[graph]["Teff"].values.astype(np.float64)
