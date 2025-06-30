@@ -29,12 +29,13 @@ def teff_analysis(pd_data: pd.DataFrame | list, save=False, object="star"):
 
         # plot part
         with plt.style.context("science"):
+            x_lim = [5000, 7000]
             # x, y = calculate_grid(s_num)
 
             chi_values = np.concatenate([d["chi_squared"].values.astype(np.float64) for d in parsed_data])
             # norm = LogNorm(vmin=np.min(chi_values), vmax=np.max(chi_values))
             norm = Normalize(vmin=np.min(chi_values), vmax=np.max(chi_values))
-            cmap = plt.get_cmap('hot')
+            cmap = plt.get_cmap('plasma')
                 
 
             mean_teff = []
@@ -57,21 +58,27 @@ def teff_analysis(pd_data: pd.DataFrame | list, save=False, object="star"):
                 teff = parsed_data[x]["Teff"].values.astype(np.float64)
                 teff_error = parsed_data[x]["Teff_error"].values.astype(np.float64)
                 chi_2 = parsed_data[x]["chi_squared"].values.astype(np.float64)
-                
-                sc = axes[x].scatter(wavelength, teff, c=chi_2, cmap=cmap, norm=norm, s=50)
+                median = np.median(teff)
+                mean = np.mean(teff)
+                std = np.std(teff)
+                stats_text = (f"Median teff: {median:.2f}\n" f"Std teff: {std:.2f}\n" f"Mean teff: {mean:.2f}")
+                axes[x].text(0.95, 0.05, stats_text,transform=axes[x].transAxes, ha='right', va='bottom', bbox=dict(facecolor='white', alpha=0.8, edgecolor='none'))
+                axes[x].plot(x_lim, [median, median], label="median") 
+                sc = axes[x].scatter(wavelength, teff, c=chi_2, cmap=cmap, norm=norm, s=50, label="fitted teff")
                 
                 axes[x].errorbar(wavelength, teff, yerr=teff_error, fmt='none', 
                                 ecolor='gray', alpha=0.5, capsize=3)
                 
                 axes[x].set_xlabel('Wavelength')
                 axes[x].set_ylabel('Teff')
-                axes[x].set_title(f'{model_data[x][0]}, {model_data[x][1]}, {model_data[x][2]}, {x+1}')
+                axes[x].set_title(f'Teff={model_data[x][0]}, log g={model_data[x][1]}, [Fe/H]={model_data[x][2]}')
                 axes[x].grid(True, alpha=0.3)
+                axes[x].legend(loc="upper right")
 
        
             fig.subplots_adjust(right=0.85)  
 
-            cbar_ax = fig.add_axes([0.88, 0.15, 0.02, 0.7])  
+            cbar_ax = fig.add_axes([0.88, 0.08, 0.02, 0.85])  
             cbar = fig.colorbar(ScalarMappable(norm=norm, cmap=cmap), cax=cbar_ax)
             cbar.set_label('chi squared value', rotation=270, labelpad=15)
 
